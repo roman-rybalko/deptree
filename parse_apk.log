@@ -1,0 +1,11 @@
+realpath: : No such file or directory
+dex2jar ../fs/app//wssyncmlnps.apk -> /tmp/eNxnBlyZ18/apk.jar
+java.lang.RuntimeException: the src file not a .dex, .odex or zip file
+	at com.googlecode.dex2jar.reader.DexFileReader.readDex(DexFileReader.java:137)
+	at com.googlecode.dex2jar.reader.DexFileReader.opDataIn(DexFileReader.java:220)
+	at com.googlecode.dex2jar.reader.DexFileReader.<init>(DexFileReader.java:239)
+	at com.googlecode.dex2jar.reader.DexFileReader.<init>(DexFileReader.java:250)
+	at com.googlecode.dex2jar.tools.Dex2jarCmd.doCommandLine(Dex2jarCmd.java:84)
+	at com.googlecode.dex2jar.tools.BaseCmd.doMain(BaseCmd.java:116)
+	at com.googlecode.dex2jar.tools.Dex2jarCmd.main(Dex2jarCmd.java:34)
+unzip:  cannot find or open /tmp/eNxnBlyZ18/apk.jar, /tmp/eNxnBlyZ18/apk.jar.zip or /tmp/eNxnBlyZ18/apk.jar.ZIP.
