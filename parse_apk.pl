@@ -19,23 +19,10 @@ my $dbh = DBI->connect($dbi, $dbi_login, $dbi_pass) or die "Unable to connect to
 
 my $dir = tempdir(CLEANUP => 1);
 
-my @libs;
-system("d2j-dex2jar.sh $apk -o $dir/apk.jar 1>&2");
-system("unzip $dir/apk.jar -d $dir 1>&2");
-system("find $dir -type f -name '*.class' | xargs jad -r -s .java -d $dir 1>&2");
-my $F;
-open $F, "find $dir -type f -name '*.java' | xargs grep -e System.loadLibrary |";
-while(<$F>)
-{
-    if (/loadLibrary\(\"(.+?)\"\)/)
-    {
-        push @libs => "lib$1.so";
-    }
-}
-
 my $obj_cnt = 0;
+my $sym_cnt = 0;
 
-$dbh->{AutoCommit} = 0;
+$dbh->begin_work;
 $dbh->{RaiseError} = 1;
 eval {
     my $obj_name = basename($apk);
@@ -47,20 +34,40 @@ eval {
         ($obj_id) = $dbh->selectrow_array("select id from objects where crc = $obj_crc and name = '$obj_name'");
         ++$obj_cnt;
     }
+    $dbh->do("delete from provides where object_id = $obj_id");
+    $dbh->do("delete from depends where object_id = $obj_id");
 
-    foreach my $lib (@libs)
+    my $sym_name = $obj_name;
+    my $sym_crc = crc32($sym_name);
+    my ($sym_id) = $dbh->selectrow_array("select id from symbols where crc = $sym_crc and name = '$sym_name'");
+    unless ($sym_id)
     {
-        my $lib_name = $lib;
-        my $lib_crc = crc32($lib_name);
-        my ($lib_id) = $dbh->selectrow_array("select id from objects where crc = $lib_crc and name = '$lib_name'");
-        unless ($lib_id)
+        $dbh->do("insert into symbols(name,crc) values('$sym_name',$sym_crc)");
+        ($sym_id) = $dbh->selectrow_array("select id from symbols where crc = $sym_crc and name = '$sym_name'");    
+        ++$sym_cnt;
+    }
+    $dbh->do("insert into provides(object_id,symbol_id) values($obj_id,$sym_id)");
+
+    system("d2j-dex2jar.sh $apk -o $dir/apk.jar 1>&2");
+    system("unzip $dir/apk.jar -d $dir 1>&2");
+    system("find $dir -type f -name '*.class' | xargs jad -r -s .java -d $dir 1>&2");
+    my $F;
+    open $F, "find $dir -type f -name '*.java' | xargs grep -e System.loadLibrary |";
+    while(<$F>)
+    {
+        if (/loadLibrary\(\"(.+?)\"\)/)
         {
-            $dbh->do("insert into objects(name,crc) values('$lib_name',$lib_crc)");
-            ($lib_id) = $dbh->selectrow_array("select id from objects where crc = $lib_crc and name = '$lib_name'");    
-            ++$obj_cnt;
+            my $lib_name = "lib$1.so";
+            my $lib_crc = crc32($lib_name);
+            my ($lib_id) = $dbh->selectrow_array("select id from objects where crc = $lib_crc and name = '$lib_name'");
+            unless ($lib_id)
+            {
+                $dbh->do("insert into objects(name,crc) values('$lib_name',$lib_crc)");
+                ($lib_id) = $dbh->selectrow_array("select id from objects where crc = $lib_crc and name = '$lib_name'");    
+                ++$obj_cnt;
+            }
+            $dbh->do("insert into depends(object_id,symbol_id) values($obj_id,$lib_id)");
         }
-        $dbh->do("delete from object_depends where id = $obj_id");
-        $dbh->do("insert into object_depends(id,dep_id) values($obj_id,$lib_id)");
     }
 };
 $dbh->{RaiseError} = 0;

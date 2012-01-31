@@ -21,6 +21,7 @@ my $dir = tempdir(CLEANUP => 1);
 
 my $obj_cnt = 0;
 my $sym_cnt = 0;
+my $sym_skip_cnt = 0;
 
 $dbh->begin_work;
 $dbh->{RaiseError} = 1;
@@ -34,19 +35,23 @@ eval {
         ($obj_id) = $dbh->selectrow_array("select id from objects where crc = $obj_crc and name = '$obj_name'");
         ++$obj_cnt;
     }
-    $dbh->do("delete from object_symbol_provides where object_id = $obj_id");
-    $dbh->do("delete from object_symbol_depends where object_id = $obj_id");
+    $dbh->do("delete from provides where object_id = $obj_id");
+    $dbh->do("delete from depends where object_id = $obj_id");
 
     my $sym_name = $obj_name;
     my $sym_crc = crc32($sym_name);
     my ($sym_id) = $dbh->selectrow_array("select id from symbols where crc = $sym_crc and name = '$sym_name'");
-    unless ($sym_id)
+    if ($sym_id)
+    {
+        ++$sym_skip_cnt;
+    }
+    else
     {
         $dbh->do("insert into symbols(name,crc) values('$sym_name',$sym_crc)");
         ($sym_id) = $dbh->selectrow_array("select id from symbols where crc = $sym_crc and name = '$sym_name'");    
         ++$sym_cnt;
     }
-    $dbh->do("insert into object_symbol_provides(object_id,symbol_id) values($obj_id,$sym_id)");
+    $dbh->do("insert into provides(object_id,symbol_id) values($obj_id,$sym_id)");
 
     my $F;
     open $F, "arm-eabi-nm -D $lib |";
@@ -58,7 +63,11 @@ eval {
             $sym_name = $2;
             $sym_crc = crc32($sym_name);
             ($sym_id) = $dbh->selectrow_array("select id from symbols where crc = $sym_crc and name = '$sym_name'");
-            unless ($sym_id)
+            if ($sym_id)
+            {
+                ++$sym_skip_cnt;
+            }
+            else
             {
                 $dbh->do("insert into symbols(name,crc) values('$sym_name',$sym_crc)");
                 ($sym_id) = $dbh->selectrow_array("select id from symbols where crc = $sym_crc and name = '$sym_name'");    
@@ -66,11 +75,11 @@ eval {
             }
             if ($sym_defined)
             {
-                $dbh->do("insert into object_symbol_provides(object_id,symbol_id) values($obj_id,$sym_id)");
+                $dbh->do("insert into provides(object_id,symbol_id) values($obj_id,$sym_id)");
             }
             else
             {
-                $dbh->do("insert into object_symbol_depends(object_id,symbol_id) values($obj_id,$sym_id)");
+                $dbh->do("insert into depends(object_id,symbol_id) values($obj_id,$sym_id)");
             }
         }
     }
@@ -83,6 +92,6 @@ if ($@)
 else
 {
     $dbh->commit;
-    print "$obj_cnt objects added, $sym_cnt symbols added\n";
+    print "$obj_cnt objects added, $sym_cnt symbols added, $sym_skip_cnt symbols skipped\n";
 }
 
