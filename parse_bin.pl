@@ -7,9 +7,9 @@ use DBI;
 use File::Basename qw(basename);
 use Digest::CRC qw(crc32);
 
-my $usage = "USAGE: $0 <lib.so> <dbi:SQLite:dbname=file.sqlite> [login] [pass]";
+my $usage = "USAGE: $0 <bin/lib.so> <dbi:SQLite:dbname=file.sqlite> [login] [pass]";
 
-my $lib = shift or die $usage;
+my $bin = shift or die $usage;
 my $dbi = shift or die $usage;
 my $dbi_login = shift;
 my $dbi_pass = shift;
@@ -65,7 +65,7 @@ sub dep_add
 $dbh->begin_work;
 $dbh->{RaiseError} = 1;
 eval {
-    my $obj_name = basename($lib);
+    my $obj_name = basename($bin);
     my $obj_crc = crc32($obj_name);
     my ($obj_id) = $dbh->selectrow_array("select id from objects where crc = $obj_crc and name = '$obj_name'");
     unless ($obj_id)
@@ -83,7 +83,7 @@ eval {
     };
 
     my $F;
-    open $F, "arm-eabi-readelf -d $lib |";
+    open $F, "arm-eabi-readelf -d $bin |";
     while(<$F>)
     {
         if(/library:\s+\[(.+?)\]/)
@@ -101,6 +101,7 @@ eval {
 $dbh->{RaiseError} = 0;
 if ($@)
 {
+    print "error: $@\n";
     $dbh->rollback;
 }
 else

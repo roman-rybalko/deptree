@@ -196,7 +196,7 @@ eval {
         system("d2j-dex2jar.sh $dex_file -o $jar_file 1>&2");
         system("unzip -d $class_dir -q $jar_file 1>&2");
         my $F_java;
-        open $F_java, "find $class_dir -type f -name '*.class' | xargs jad -p |";
+        open $F_java, "find $class_dir -type f -name '*.class' | xargs -L 1 jad.sh -p |";
         my $current_package_name = "";
         my %imports;
         my %packages;
@@ -214,7 +214,7 @@ eval {
                 my $target = $1;
                 if (substr($target,length($target)-1,1) eq "*")
                 {
-                    $target = substr($target,0, length($target)-2);
+                    $target = substr($target,0,length($target)-2);
                 }
                 ++$imports{$target};
             }
@@ -251,6 +251,7 @@ eval {
 $dbh->{RaiseError} = 0;
 if ($@)
 {
+    print "error: $@\n";
     $dbh->rollback;
 }
 else

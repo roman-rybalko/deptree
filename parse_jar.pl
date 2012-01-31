@@ -128,8 +128,8 @@ eval {
         system("d2j-dex2jar.sh $dex_file -o $jar_file 1>&2");
         system("unzip -d $class_dir -q $jar_file 1>&2");
         my $F_java;
-        open $F_java, "find $class_dir -type f -name '*.class' | xargs jad -p |";
-        my $java_package_name = "";
+        open $F_java, "find $class_dir -type f -name '*.class' | xargs -L 1 jad.sh -p |";
+        my $current_package_name = "";
         while (<$F_java>)
         {
             if (/loadLibrary\(\"(.+?)\"\)/)
@@ -143,7 +143,7 @@ eval {
                 my $target = $1;
                 if (substr($target,length($target)-1,1) eq "*")
                 {
-                    $target = substr($target,0, length($target)-2);
+                    $target = substr($target,0,length($target)-2);
                 }
                 #print "added import $target from line $_";
                 my $sym_id = sym_add($target);
@@ -151,15 +151,15 @@ eval {
             }
             if (/^package\s+(\S+);/)
             {
-                $java_package_name = $1;
-                #print "added package $java_package_name from line $_";
-                my $sym_id = sym_add($java_package_name);
+                $current_package_name = $1;
+                #print "added package $current_package_name from line $_";
+                my $sym_id = sym_add($current_package_name);
                 prov_add($obj_id,$sym_id);
             }
             if (/^\s*(?:public\s+)?(?:final\s+)?class\s+(\S+)/)
             {
                 my $class_name = $1;
-                my $full_class_name = "$java_package_name.$class_name";
+                my $full_class_name = "$current_package_name.$class_name";
                 #print "added class $class_name ($full_class_name) from line $_";
                 my $sym_id = sym_add($full_class_name);
                 prov_add($obj_id,$sym_id);
@@ -170,6 +170,7 @@ eval {
 $dbh->{RaiseError} = 0;
 if ($@)
 {
+    print "error: $@\n";
     $dbh->rollback;
 }
 else
