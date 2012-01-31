@@ -197,7 +197,10 @@ eval {
         system("unzip -d $class_dir -q $jar_file 1>&2");
         my $F_java;
         open $F_java, "find $class_dir -type f -name '*.class' | xargs jad -p |";
-        my $java_package_name = "";
+        my $current_package_name = "";
+        my %imports;
+        my %packages;
+        my %classes;
         while (<$F_java>)
         {
             if (/loadLibrary\(\"(.+?)\"\)/)
@@ -213,22 +216,35 @@ eval {
                 {
                     $target = substr($target,0, length($target)-2);
                 }
-                my $sym_id = sym_add($target);
-                dep_add($obj_id,$sym_id);
+                ++$imports{$target};
             }
             if (/^package\s+(\S+);/)
             {
-                $java_package_name = $1;
-                my $sym_id = sym_add($java_package_name);
-                prov_add($obj_id,$sym_id);
+                $current_package_name = $1;
+                ++$packages{$current_package_name};
             }
             if (/class\s+(\S+)/)
             {
                 my $class_name = $1;
-                my $full_class_name = "$java_package_name.$class_name";
-                my $sym_id = sym_add($full_class_name);
-                prov_add($obj_id,$sym_id);
+                my $full_class_name = "$current_package_name.$class_name";
+                ++$classes{$full_class_name};
             }
+        }
+        foreach my $class (keys %classes)
+        {
+            #print "removed class $class\n";
+            delete $imports{$class};
+        }
+        foreach my $package (keys %packages)
+        {
+            #print "removed package $package\n";
+            delete $imports{$package};
+        }
+        foreach my $import (keys %imports)
+        {
+            #print "added import $import\n";
+            my $sym_id = sym_add($import);
+            dep_add($obj_id,$sym_id);
         }
     }
 };
