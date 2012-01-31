@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use DBI;
-use File::Temp qw(tempdir);
 use File::Basename qw(basename);
 use Digest::CRC qw(crc32);
 
@@ -17,11 +16,51 @@ my $dbi_pass = shift;
 
 my $dbh = DBI->connect($dbi, $dbi_login, $dbi_pass) or die "Unable to connect to db";
 
-my $dir = tempdir(CLEANUP => 1);
-
 my $obj_cnt = 0;
 my $sym_cnt = 0;
-my $sym_skip_cnt = 0;
+my $prov_cnt = 0;
+my $dep_cnt = 0;
+
+sub sym_add
+{
+    my $sym_name = shift;
+    my $sym_crc = crc32($sym_name);
+    my ($sym_id) = $dbh->selectrow_array("select id from symbols where crc = $sym_crc and name = '$sym_name'");
+    unless ($sym_id)
+    {
+        $dbh->do("insert into symbols(name,crc) values('$sym_name',$sym_crc)");
+        ($sym_id) = $dbh->selectrow_array("select id from symbols where crc = $sym_crc and name = '$sym_name'");    
+        ++$sym_cnt;
+    }
+    return $sym_id;
+}
+
+my $prov_cache;
+sub prov_add
+{
+    my $obj_id = shift;
+    my $sym_id = shift;
+    
+    unless ($prov_cache->{$obj_id}->{$sym_id})
+    {
+        ++$prov_cache->{$obj_id}->{$sym_id};
+        $dbh->do("insert into provides(object_id,symbol_id) values($obj_id,$sym_id)");
+        ++$prov_cnt;
+    }
+}
+
+my $dep_cache;
+sub dep_add
+{
+    my $obj_id = shift;
+    my $sym_id = shift;
+    unless ($dep_cache->{$obj_id}->{$sym_id})
+    {
+        ++$dep_cache->{$obj_id}->{$sym_id};
+        $dbh->do("insert into depends(object_id,symbol_id) values($obj_id,$sym_id)");
+        ++$dep_cnt;
+    }
+}
 
 $dbh->begin_work;
 $dbh->{RaiseError} = 1;
@@ -38,49 +77,24 @@ eval {
     $dbh->do("delete from provides where object_id = $obj_id");
     $dbh->do("delete from depends where object_id = $obj_id");
 
-    my $sym_name = $obj_name;
-    my $sym_crc = crc32($sym_name);
-    my ($sym_id) = $dbh->selectrow_array("select id from symbols where crc = $sym_crc and name = '$sym_name'");
-    if ($sym_id)
-    {
-        ++$sym_skip_cnt;
-    }
-    else
-    {
-        $dbh->do("insert into symbols(name,crc) values('$sym_name',$sym_crc)");
-        ($sym_id) = $dbh->selectrow_array("select id from symbols where crc = $sym_crc and name = '$sym_name'");    
-        ++$sym_cnt;
-    }
-    $dbh->do("insert into provides(object_id,symbol_id) values($obj_id,$sym_id)");
+    do {
+        my $sym_id = sym_add($obj_name);
+        prov_add($obj_id,$sym_id);
+    };
 
     my $F;
-    open $F, "arm-eabi-nm -D $lib |";
+    open $F, "arm-eabi-readelf -d $lib |";
     while(<$F>)
     {
-        if(/^(\S+)?\s+\S+\s+(\S+)/)
+        if(/library:\s+\[(.+?)\]/)
         {
-            my $sym_defined = $1;
-            $sym_name = $2;
-            $sym_crc = crc32($sym_name);
-            ($sym_id) = $dbh->selectrow_array("select id from symbols where crc = $sym_crc and name = '$sym_name'");
-            if ($sym_id)
-            {
-                ++$sym_skip_cnt;
-            }
-            else
-            {
-                $dbh->do("insert into symbols(name,crc) values('$sym_name',$sym_crc)");
-                ($sym_id) = $dbh->selectrow_array("select id from symbols where crc = $sym_crc and name = '$sym_name'");    
-                ++$sym_cnt;
-            }
-            if ($sym_defined)
-            {
-                $dbh->do("insert into provides(object_id,symbol_id) values($obj_id,$sym_id)");
-            }
-            else
-            {
-                $dbh->do("insert into depends(object_id,symbol_id) values($obj_id,$sym_id)");
-            }
+            my $sym_id = sym_add($1);
+            dep_add($obj_id,$sym_id);
+        }
+        if(/soname:\s+\[(.+?)\]/)
+        {
+            my $sym_id = sym_add($1);
+            prov_add($obj_id,$sym_id);
         }
     }
 };
@@ -92,6 +106,5 @@ if ($@)
 else
 {
     $dbh->commit;
-    print "$obj_cnt objects added, $sym_cnt symbols added, $sym_skip_cnt symbols skipped\n";
+    print "added: $obj_cnt objects, $sym_cnt symbols, $dep_cnt dependencies, $prov_cnt providings\n";
 }
-

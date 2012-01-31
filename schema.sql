@@ -13,4 +13,3 @@ create table depends(object_id integer not null, symbol_id integer not null);
 create index depends_idx_sym on depends(symbol_id);
 create index depends_idx_obj on depends(object_id);
 create unique index depends_idx_key on depends(object_id,symbol_id);
-
