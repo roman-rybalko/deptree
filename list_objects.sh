@@ -1,3 +1,3 @@
-#!/bin/sh -xe
+#!/bin/sh 
 
-sqlite3 test.sqlite "select name from objects"
+./list_objects.pl "$1" dbi:SQLite:dbname=test.sqlite
