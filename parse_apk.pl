@@ -223,13 +223,14 @@ eval {
                 $current_package_name = $1;
                 ++$packages{$current_package_name};
             }
-            if (/class\s+(\S+)/)
+            if (/^\s*(?:public\s+)?(?:final\s+)?class\s+(\S+)/)
             {
                 my $class_name = $1;
                 my $full_class_name = "$current_package_name.$class_name";
                 ++$classes{$full_class_name};
             }
         }
+        # Apps are isolated, removig internal dependencies.
         foreach my $class (keys %classes)
         {
             #print "removed class $class\n";
