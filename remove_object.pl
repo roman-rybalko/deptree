@@ -6,6 +6,10 @@ use warnings;
 use DBI;
 use File::Basename qw(basename);
 use Digest::CRC qw(crc32);
+use constant {
+    REMOVE_REASON_DEPENDENCY => 1,
+    REMOVE_REASON_NOT_NEEDED => 2,
+};
 
 my $usage = "USAGE: $0 <object.apk/jar/so> <dbi:SQLite:dbname=file.sqlite> [login] [pass]";
 
@@ -21,7 +25,7 @@ my %obj_ids;
 sub obj_upper
 {
     my $obj_id = shift;
-    my $data = $dbh->selectall_arrayref("select object_id from depends where symbol_id in (select symbol_id from provides where object_id = $obj_id)");
+    my $data = $dbh->selectall_arrayref("select object_id from depends where symbol_id in (select symbol_id from provides where object_id = $obj_id) group by object_id");
     my @obj_ids;
     foreach my $row (@{$data})
     {
@@ -33,7 +37,7 @@ sub obj_upper
 sub obj_lower
 {
     my $obj_id = shift;
-    my $data = $dbh->selectall_arrayref("select object_id from provides where symbol_id in (select symbol_id from depends where object_id = $obj_id)");
+    my $data = $dbh->selectall_arrayref("select object_id from provides where symbol_id in (select symbol_id from depends where object_id = $obj_id) group by object_id");
     my @obj_ids;
     foreach my $row (@{$data})
     {
@@ -42,41 +46,20 @@ sub obj_lower
     return @obj_ids;
 }
 
-sub obj_remove
+sub obj_remove_upper
 {
     my $obj_id = shift;
     
-    if (exists($obj_ids{$obj_id}))
+    if (exists $obj_ids{$obj_id})
     {
         return;
     }
     
-    $obj_ids{$obj_id} = 1;
+    $obj_ids{$obj_id} = REMOVE_REASON_DEPENDENCY;
     
-    my @obj_ids;
-
-    # upper objects in tree, obligatory (dependency is removed)
-    foreach my $upper_obj_id (obj_upper($obj_id))
+    foreach my $upper_obj_id_obj_id (obj_upper($obj_id))
     {
-        obj_remove($upper_obj_id);
-    }
-    
-    # lower objects in tree, optional (may be are not needed)
-    foreach my $lower_obj_id (obj_lower($obj_id))
-    {
-        my $remove_flag = 1;
-        foreach my $upper_obj_id (obj_upper($lower_obj_id))
-        {
-            unless (exists($obj_ids{$upper_obj_id}))
-            {
-                $remove_flag = 0;
-                last;
-            }
-        }
-        if ($remove_flag)
-        {
-            obj_remove($lower_obj_id);
-        }
+        obj_remove_upper($upper_obj_id_obj_id);
     }
 }
 
@@ -92,7 +75,41 @@ eval {
         exit 1;
     }
     
-    obj_remove($obj_id);
+    obj_remove_upper($obj_id);
+    
+    my %check_obj_ids = %obj_ids;
+    while (%check_obj_ids)
+    {
+        my %remove_obj_ids;
+        foreach $obj_id (keys %check_obj_ids)
+        {
+            foreach my $lower_obj_id (obj_lower($obj_id))
+            {
+                if (exists $obj_ids{$lower_obj_id})
+                {
+                    next;
+                }
+                my $remove_flag = 1;
+                foreach my $upper_obj_id (obj_upper($lower_obj_id))
+                {
+                    if (! exists $obj_ids{$upper_obj_id})
+                    {
+                        $remove_flag = 0;
+                        last;
+                    }
+                }
+                if ($remove_flag)
+                {
+                    $remove_obj_ids{$lower_obj_id} = REMOVE_REASON_NOT_NEEDED;
+                }
+            }
+        }
+        foreach my $remove_obj_id (keys %remove_obj_ids)
+        {
+            $obj_ids{$remove_obj_id} = $remove_obj_ids{$remove_obj_id};
+        }
+        %check_obj_ids = %remove_obj_ids;
+    }
     
     foreach $obj_id (keys %obj_ids)
     {
@@ -106,4 +123,3 @@ if ($@)
 }
 $dbh->{RaiseError} = 0;
 $dbh->rollback;
-

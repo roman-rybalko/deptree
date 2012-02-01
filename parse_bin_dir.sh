@@ -11,7 +11,7 @@ while [ -n "$1" ]; do
                 ;;
         esac
         printf "$bin:\t"
-        ./parse_bin.pl "$bin" dbi:SQLite:dbname=test2.sqlite 2>>parse_bin.log
+        ./parse_bin.pl "$bin" dbi:SQLite:dbname=test.sqlite 2>>parse_bin.log
     done
     shift
 done
