@@ -1,0 +1,74 @@
+Reset/init database (test.sqlite).
+$ ./init_db.sh
+... (output)
+
+Parsing. Specify "system" filesystem tree. system/bin/*, system/xbin/* should be executables (chmod a+x bin/* xbin/*).
+$ ./parse_rom_dir.sh /path/to/unpacked/rom/system
+... (too long output, duration ~15-35min)
+
+List binaries/jars/apks, which names contain "adrenaline".
+$ ./list_objects.sh adrenaline
+Asphalt6_AdrenalineHD_SamsungSCH-i927_ML_IGP_ATT_MP_GLLive_DEMO_104.apk 139 dependencies 7 providings
+$ ./list_objects.sh ext2
+libext2_blkid.so 2 dependencies 1 providings
+libext2_com_err.so 3 dependencies 1 providings
+libext2_e2p.so 1 dependencies 1 providings
+libext2_uuid.so 3 dependencies 1 providings
+libext2fs.so 5 dependencies 1 providings
+
+Calculate objects that should be removed also if this one is removed.
+$ ./remove_object.sh Asphalt6_AdrenalineHD_SamsungSCH-i927_ML_IGP_ATT_MP_GLLive_DEMO_104.apk
+libasphalt6.so not_needed
+Asphalt6_AdrenalineHD_SamsungSCH-i927_ML_IGP_ATT_MP_GLLive_DEMO_104.apk dependency
+$ ./remove_object.sh libext2fs.so
+libext2_uuid.so not_needed
+libext2_blkid.so not_needed
+libext2_com_err.so not_needed
+libdiskconfig.so not_needed
+libext2fs.so dependency
+libext2_e2p.so not_needed
+vold dependency
+$ ./remove_object.sh ext.jar
+LiveWallpapers.apk dependency
+MobileTrackerEngineTwo.apk dependency
+libandroid_servers.so not_needed
+SnsImageCache.apk dependency
+libmobiletag-decoder.so not_needed
+...
+secmediarecorder.jar dependency
+android.test.runner.jar dependency
+PhoneErrService.apk dependency
+att_code_scanner_v2_0_45_aligned.apk dependency
+
+List symbols and objects, which provide/require them. Substring may be specified.
+$ ./list_symbols.sh libext2fs.so
+libext2fs.so
+required by:
+vold
+provided by:
+libext2fs.so
+$ ./list_symbols.sh iqclient
+com.carrieriq.iqagent.client.IQClient
+required by:
+android.policy.jar
+ext.jar
+framework.jar
+services.jar
+provided by:
+ext.jar
+com.android.internal.policy.impl.IQClientThreadRunnable
+required by:
+provided by:
+android.policy.jar
+
+List symbols, which the object provides and on which depends.
+$ ./list_dependencies.sh libext2fs.so
+libext2fs.so
+depends:
+libc.so
+libext2_blkid.so
+libext2_uuid.so
+libext2_com_err.so
+libext2_e2p.so
+provides:
+libext2fs.so

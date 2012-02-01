@@ -114,7 +114,7 @@ eval {
     foreach $obj_id (keys %obj_ids)
     {
         my ($obj_name) = $dbh->selectrow_array("select name from objects where id = $obj_id");
-        print "$obj_name\n";
+        print "$obj_name ", $obj_ids{$obj_id} == REMOVE_REASON_DEPENDENCY ? "dependency" : "not_needed", "\n";
     }
 };
 if ($@)
