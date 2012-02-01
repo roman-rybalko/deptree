@@ -1,3 +1,7 @@
+Perl modules needed:
+DBI, DBD::SQLite, Digest::CRC, File::Basename (usually shipped with perl), File::Temp, XML::Parser
+(for Debian: libdbi-perl, libdbd-sqlite3-perl, libdigest-crc-perl, libfile-temp-perl, libxml-parser-perl)
+
 Reset/init database (test.sqlite).
 $ ./init_db.sh
 ... (output)
