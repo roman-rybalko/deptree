@@ -7,7 +7,7 @@ use DBI;
 use File::Basename qw(basename);
 use Digest::CRC qw(crc32);
 
-my $usage = "USAGE: $0 <bin/lib.so> <dbi:SQLite:dbname=file.sqlite> [login] [pass]";
+my $usage = "USAGE: $0 <bin/lib.so> <dbi:SQLite:dbname=file.sqlite> [login [pass]]";
 
 my $bin = shift or die $usage;
 my $dbi = shift or die $usage;

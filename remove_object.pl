@@ -11,7 +11,7 @@ use constant {
     REMOVE_REASON_NOT_NEEDED => 2,
 };
 
-my $usage = "USAGE: $0 <object.apk/jar/so> <dbi:SQLite:dbname=file.sqlite> [login] [pass]";
+my $usage = "USAGE: $0 <object> <dbi:SQLite:dbname=file.sqlite> [login [pass [object [object [...]]]]]";
 
 my $obj = shift or die $usage;
 my $dbi = shift or die $usage;
@@ -76,6 +76,18 @@ eval {
     }
     
     obj_remove_upper($obj_id);
+    
+    foreach $obj_name (@ARGV)
+    {
+        $obj_crc = crc32($obj_name);
+        ($obj_id) = $dbh->selectrow_array("select id from objects where crc = $obj_crc and name = '$obj_name'");
+        unless ($obj_id)
+        {
+            print "Unable to find object $obj_name crc=$obj_crc\n";
+            exit 1;
+        }
+        obj_remove_upper($obj_id);
+    }
     
     my %check_obj_ids = %obj_ids;
     while (%check_obj_ids)

@@ -1,8 +1,8 @@
 Perl modules needed:
 DBI, DBD::SQLite, Digest::CRC, File::Basename (usually shipped with perl), File::Temp, XML::Parser
-(for Debian: libdbi-perl, libdbd-sqlite3-perl, libdigest-crc-perl, libfile-temp-perl, libxml-parser-perl)
+(Debian pkgs: libdbi-perl, libdbd-sqlite3-perl, libdigest-crc-perl, libfile-temp-perl, libxml-parser-perl)
 
-Reset/init database (test.sqlite).
+Reset/init database (test.sqlite). If you don't do this - database will be updated.
 $ ./init_db.sh
 ... (output)
 
@@ -43,6 +43,12 @@ secmediarecorder.jar dependency
 android.test.runner.jar dependency
 PhoneErrService.apk dependency
 att_code_scanner_v2_0_45_aligned.apk dependency
+$ ./remove_object.sh ATTNavigator.apk Asphalt6_AdrenalineHD_SamsungSCH-i927_ML_IGP_ATT_MP_GLLive_DEMO_104.apk Vending.apk
+libasphalt6.so not_needed
+Asphalt6_AdrenalineHD_SamsungSCH-i927_ML_IGP_ATT_MP_GLLive_DEMO_104.apk dependency
+Vending.apk dependency
+MarketUpdater.apk dependency
+ATTNavigator.apk dependency
 
 List symbols and objects, which provide/require them. Substring may be specified.
 $ ./list_symbols.sh libext2fs.so
@@ -65,175 +71,54 @@ required by:
 provided by:
 android.policy.jar
 
-List symbols, which the object provides and on which depends.
-$ ./list_dependencies.sh libext2fs.so
-libext2fs.so
-depends:
-libc.so
-libext2_blkid.so
-libext2_uuid.so
-libext2_com_err.so
-libext2_e2p.so
-provides:
-libext2fs.so
-$ ./list_dependencies.sh asphalt
-libasphalt6.so
-depends:
-libc.so
-libstdc++.so
-libm.so
-liblog.so
-libdl.so
-libGLESv1_CM.so
-libGLESv2.so
-provides:
-libasphalt6.so
-Asphalt6_AdrenalineHD_SamsungSCH-i927_ML_IGP_ATT_MP_GLLive_DEMO_104.apk
-depends:
-libasphalt6.so
-android.os.Bundle
-java.io.PrintStream
-java.util.Iterator
-android.content.Intent
-java.io
-android.net.Uri
-android.os
-android.content.Context
-android.widget.EditText
-android.widget.TextView
-java.io.IOException
-android.app.ProgressDialog
-android.content.res.Configuration
-android.content.res.Resources
-android.graphics.Rect
-android.view
-android.util.AttributeSet
-android.util.Log
-android.content
-java.util
-android.view.KeyEvent
-android.view.View
-android.widget.Button
-java.util.Date
-android.widget.RelativeLayout
-android.content.DialogInterface
-android.app.AlertDialog
-android.view.MotionEvent
-android.graphics.Bitmap
-android.graphics.BitmapFactory
-java.io.FileNotFoundException
-java.io.InputStream
-android.media.AudioManager
-java.util.ArrayList
-android.net.ConnectivityManager
-android.telephony.TelephonyManager
-java.io.File
-android.view.Window
-java.util.List
-android.text.Editable
-android.text.TextWatcher
-android.view.inputmethod.InputMethodManager
-java.util.HashMap
-java.util.Locale
-android.app.NotificationManager
-android.app.Activity
-java.util.zip.ZipEntry
-java.util.zip.ZipFile
-android.content.res.AssetManager
-android.content.res.AssetFileDescriptor
-java.util.Random
-android.os.Environment
-java.util.Enumeration
-java.util.Vector
-java.net.URL
-java.security.SecureRandom
-javax.crypto
-javax.crypto.spec.SecretKeySpec
-java.io.ByteArrayInputStream
-java.security.cert.X509Certificate
-android.app.PendingIntent
-android.net.NetworkInfo
-java.util.zip.GZIPInputStream
-java.util.zip
-org.apache.http.impl.client.DefaultHttpClient
-android.os.Build
-java.nio.charset.Charset
-java.io.FileOutputStream
-java.io.DataInputStream
-java.net
-java.nio
-java.util.zip.GZIPOutputStream
-java.util.Timer
-java.net.SocketException
-java.net.SocketTimeoutException
-javax.net.ssl
-org.xml.sax.Attributes
-javax.xml.parsers.SAXParser
-javax.net.ssl.SSLSession
-javax.net.ssl.X509TrustManager
-org.xml.sax.helpers.DefaultHandler
-org.xml.sax.XMLReader
-org.xml.sax.InputSource
-java.net.HttpURLConnection
-java.util.TimerTask
-org.apache.http.client.entity.UrlEncodedFormEntity
-org.apache.http.client.methods.HttpPost
-org.apache.http.message.BasicNameValuePair
-org.apache.http.HttpConnection
-android.os.Looper
-android.os.Process
-android.content.BroadcastReceiver
-android.os.StatFs
-android.content.IntentFilter
-android.view.Display
-android.text.TextPaint
-android.content.SharedPreferences
-android.net.wifi.WifiManager
-android.widget.ProgressBar
-android.graphics.Typeface
-android.webkit.WebView
-android.hardware
-javax.microedition.khronos.egl
-android.widget.AbsoluteLayout
-android.widget.ImageButton
-android.media.MediaPlayer
-android.view.SurfaceHolder
-android.graphics.drawable.PaintDrawable
-android.view.WindowManager
-android.telephony.SmsManager
-android.telephony.SmsMessage
-javax.net.ssl.HostnameVerifier
-android.net.wifi.WifiInfo
-android.opengl.GLES20
-javax.microedition.khronos.opengles.GL10
-android.opengl.GLSurfaceView
-android.opengl.GLUtils
-android.webkit.WebSettings
-android.webkit.WebViewClient
-android.permission.INTERNET
-android.permission.ACCESS_WIFI_STATE
-android.permission.CHANGE_WIFI_STATE
-android.permission.DEVICE_POWER
-android.permission.WAKE_LOCK
-android.permission.READ_PHONE_STATE
-android.permission.RECEIVE_SMS
-android.permission.ACCESS_NETWORK_STATE
-android.permission.WRITE_EXTERNAL_STORAGE
-android.permission.VIBRATE
-android.permission.CHANGE_NETWORK_STATE
-android.permission.RESTART_PACKAGES
-android.permission.WRITE_SETTINGS
-android.permission.SEND_SMS
-android.permission.WRITE_SMS
-android.permission.READ_SMS
-javax.xml.parsers.SAXParserFactory
-org.apache.http.client.HttpClient
-javax.microedition.khronos.egl.EGL10
-provides:
-com.gameloft.android.ATT.GloftA6HP.asphalt6.installer.GameInstaller
-com.gameloft.android.ATT.GloftA6HP.asphalt6.MyVideoView
-com.gameloft.android.ATT.GloftA6HP.asphalt6.GLGame
-com.gameloft.android.ATT.GloftA6HP.asphalt6.GLiveMain
-com.gameloft.android.ATT.GloftA6HP.asphalt6.IGPMain
-com.gameloft.android.ATT.GloftA6HP.asphalt6.Billing.AndroidBilling
-com.gameloft.android.ATT.GloftA6HP.asphalt6.Billing.SmsReceiver
+List symbols/objects, which the object provides and on which depends.
+$ ./list_dependencies.sh ext2
+object libext2_blkid.so
+depends_on_symbols libc.so libext2_uuid.so
+provides_symbols libext2_blkid.so
+depends_on_objects libc.so libext2_uuid.so
+dependent_objects libext2fs.so
+object libext2_com_err.so
+depends_on_symbols libc.so libstdc++.so libm.so
+provides_symbols libext2_com_err.so
+depends_on_objects libc.so libm.so libstdc++.so
+dependent_objects libext2fs.so
+object libext2_e2p.so
+depends_on_symbols libc.so
+provides_symbols libext2_e2p.so
+depends_on_objects libc.so
+dependent_objects libext2fs.so
+object libext2_uuid.so
+depends_on_symbols libc.so libstdc++.so libm.so
+provides_symbols libext2_uuid.so
+depends_on_objects libc.so libm.so libstdc++.so
+dependent_objects libext2_blkid.so libext2fs.so
+object libext2fs.so
+depends_on_symbols libc.so libext2_blkid.so libext2_uuid.so libext2_com_err.so libext2_e2p.so
+provides_symbols libext2fs.so
+depends_on_objects libc.so libext2_blkid.so libext2_com_err.so libext2_e2p.so libext2_uuid.so
+dependent_objects vold
+$ ./list_dependencies.sh asphalt6
+object libasphalt6.so
+depends_on_symbols libc.so libstdc++.so libm.so liblog.so libdl.so libGLESv1_CM.so libGLESv2.so
+provides_symbols libasphalt6.so
+depends_on_objects libGLESv1_CM.so libGLESv2.so libc.so libdl.so liblog.so libm.so libstdc++.so
+dependent_objects Asphalt6_AdrenalineHD_SamsungSCH-i927_ML_IGP_ATT_MP_GLLive_DEMO_104.apk
+object Asphalt6_AdrenalineHD_SamsungSCH-i927_ML_IGP_ATT_MP_GLLive_DEMO_104.apk
+depends_on_symbols libasphalt6.so android.os.Bundle java.io.PrintStream java.util.Iterator android.content.Intent java.io android.net.Uri android.os android.content.Context android.widget.EditText android.widget.TextView java.io.IOException android.app.ProgressDialog android.content.res.Configuration android.content.res.Resources android.graphics.Rect android.view android.util.AttributeSet android.util.Log android.content java.util android.view.KeyEvent android.view.View android.widget.Button java.util.Date android.widget.RelativeLayout android.content.DialogInterface android.app.AlertDialog android.view.MotionEvent android.graphics.Bitmap android.graphics.BitmapFactory java.io.FileNotFoundException java.io.InputStream android.media.AudioManager java.util.ArrayList android.net.ConnectivityManager android.telephony.TelephonyManager java.io.File android.view.Window java.util.List android.text.Editable android.text.TextWatcher android.view.inputmethod.InputMethodManager java.util.HashMap java.util.Locale android.app.NotificationManager android.app.Activity java.util.zip.ZipEntry java.util.zip.ZipFile android.content.res.AssetManager android.content.res.AssetFileDescriptor java.util.Random android.os.Environment java.util.Enumeration java.util.Vector java.net.URL java.security.SecureRandom javax.crypto javax.crypto.spec.SecretKeySpec java.io.ByteArrayInputStream java.security.cert.X509Certificate android.app.PendingIntent android.net.NetworkInfo java.util.zip.GZIPInputStream java.util.zip org.apache.http.impl.client.DefaultHttpClient android.os.Build java.nio.charset.Charset java.io.FileOutputStream java.io.DataInputStream java.net java.nio java.util.zip.GZIPOutputStream java.util.Timer java.net.SocketException java.net.SocketTimeoutException javax.net.ssl org.xml.sax.Attributes javax.xml.parsers.SAXParser javax.net.ssl.SSLSession javax.net.ssl.X509TrustManager org.xml.sax.helpers.DefaultHandler org.xml.sax.XMLReader org.xml.sax.InputSource java.net.HttpURLConnection java.util.TimerTask org.apache.http.client.entity.UrlEncodedFormEntity org.apache.http.client.methods.HttpPost org.apache.http.message.BasicNameValuePair org.apache.http.HttpConnection android.os.Looper android.os.Process android.content.BroadcastReceiver android.os.StatFs android.content.IntentFilter android.view.Display android.text.TextPaint android.content.SharedPreferences android.net.wifi.WifiManager android.widget.ProgressBar android.graphics.Typeface android.webkit.WebView android.hardware javax.microedition.khronos.egl android.widget.AbsoluteLayout android.widget.ImageButton android.media.MediaPlayer android.view.SurfaceHolder android.graphics.drawable.PaintDrawable android.view.WindowManager android.telephony.SmsManager android.telephony.SmsMessage javax.net.ssl.HostnameVerifier android.net.wifi.WifiInfo android.opengl.GLES20 javax.microedition.khronos.opengles.GL10 android.opengl.GLSurfaceView android.opengl.GLUtils android.webkit.WebSettings android.webkit.WebViewClient android.permission.INTERNET android.permission.ACCESS_WIFI_STATE android.permission.CHANGE_WIFI_STATE android.permission.DEVICE_POWER android.permission.WAKE_LOCK android.permission.READ_PHONE_STATE android.permission.RECEIVE_SMS android.permission.ACCESS_NETWORK_STATE android.permission.WRITE_EXTERNAL_STORAGE android.permission.VIBRATE android.permission.CHANGE_NETWORK_STATE android.permission.RESTART_PACKAGES android.permission.WRITE_SETTINGS android.permission.SEND_SMS android.permission.WRITE_SMS android.permission.READ_SMS javax.xml.parsers.SAXParserFactory org.apache.http.client.HttpClient javax.microedition.khronos.egl.EGL10
+provides_symbols com.gameloft.android.ATT.GloftA6HP.asphalt6.installer.GameInstaller com.gameloft.android.ATT.GloftA6HP.asphalt6.MyVideoView com.gameloft.android.ATT.GloftA6HP.asphalt6.GLGame com.gameloft.android.ATT.GloftA6HP.asphalt6.GLiveMain com.gameloft.android.ATT.GloftA6HP.asphalt6.IGPMain com.gameloft.android.ATT.GloftA6HP.asphalt6.Billing.AndroidBilling com.gameloft.android.ATT.GloftA6HP.asphalt6.Billing.SmsReceiver
+depends_on_objects libasphalt6.so core.jar ext.jar framework.jar SystemInfo.apk
+dependent_objects
+$ ./list_dependencies.sh SystemInfo.apk
+object SystemInfo.apk
+depends_on_symbols android.os.Bundle java.io android.os android.content.Context android.util.AttributeSet android.util.Log android.os.Handler android.content android.os.Message android.view.View android.os.SystemProperties android.graphics.Canvas android.text.TextUtils java.util.List android.app.Service android.os.Build android.graphics.Paint android.app.ActivityManager android.view.WindowManager android.permission.RECORD_AUDIO android.permission.ACCESS_FINE_LOCATION android.permission.WAKE_LOCK android.permission.WRITE_EXTERNAL_STORAGE android.permission.RECEIVE_BOOT_COMPLETED android.permission.GET_TASKS android.permission.SET_WALLPAPER android.permission.CAMERA android.permission.READ_OWNER_DATA android.permission.WRITE_OWNER_DATA
+provides_symbols android.permission.WRITE_EXTERNAL_STORAGE android.samsung.SystemInfo.SystemInfoService android.samsung.SystemInfo.SystemInfoReceiver
+depends_on_objects core.jar framework.jar SystemInfo.apk
+dependent_objects ATTNavigator.apk Asphalt6_AdrenalineHD_SamsungSCH-i927_ML_IGP_ATT_MP_GLLive_DEMO_104.apk BluetoothOpp.apk BluetoothPbap.apk BooksPhone.apk Browser.apk CallSetting.apk Camera.apk CertInstaller.apk CityID-release.apk ClockPackage.apk Contacts.apk DataCreate.apk DefaultContainerService.apk Dlna.apk DownloadProvider.apk Email.apk FTC.apk FTM.apk FTS.apk Gallery3D.apk GenieWidget.apk Gmail.apk InputEventApp.apk JobManager.apk Kobo.apk Maps.apk MediaHub.apk MediaProvider.apk Memo.apk MiniDiary.apk Mms.apk MobilePrint.apk MtpApplication.apk MusicPlayer.apk MyFiles.apk NetworkLocation.apk PopupuiReceiver.apk PressReader.apk QuickView.apk Quickoffice.apk SamsungWidget_News.apk ScreenCaptureService.apk SecDownloadProvider.apk SecretWallpaper1.apk SecretWallpaper2.apk SelfTestMode.apk SocialHub.apk SoundPlayer.apk Superuser.apk SystemInfo.apk Talk2.apk Tasks.apk TelephonyProvider.apk TouchWiz30Launcher.apk TouchWizCalculator.apk TouchWizCalendar.apk TrimApp.apk TtsService.apk Vending.apk VideoPlayer.apk VoiceRecorder.apk VoiceSearch.apk Zinio.apk att_featuredapp.apk wssyncmldm.apk wssyncmlnps.apk
+
+References:
+AXMLPrinter - http://code.google.com/p/android4me/downloads/list
+arm-eabi-toolchain - https://www.codeaurora.org/git/projects/qrd-gb-dsds-7225/repository/revisions/cc99b832a941dc8cbb86f1607d04eb87935ddbfd/show/android/prebuilt/linux-x86/toolchain/arm-eabi-4.4.0/bin
+dex2jar - http://code.google.com/p/dex2jar/downloads/list
+jad - http://www.varaneckas.com/jad
+smali - http://code.google.com/p/smali/downloads/list

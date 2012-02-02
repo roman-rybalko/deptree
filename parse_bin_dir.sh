@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 while [ -n "$1" ]; do
     for bin in "$1"/*; do

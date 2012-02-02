@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 while [ -n "$1" ]; do
     for jar in "$1"/*.jar; do

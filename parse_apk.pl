@@ -9,7 +9,7 @@ use File::Basename qw(basename);
 use Digest::CRC qw(crc32);
 use XML::Parser;
 
-my $usage = "USAGE: $0 <package.apk> <dbi:SQLite:dbname=file.sqlite> [login] [pass]";
+my $usage = "USAGE: $0 <package.apk> <dbi:SQLite:dbname=file.sqlite> [login [pass]]";
 
 my $apk = shift or die $usage;
 my $dbi = shift or die $usage;

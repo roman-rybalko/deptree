@@ -5,7 +5,7 @@ use warnings;
 
 use DBI;
 
-my $usage = "USAGE: $0 <object-name/substring> <dbi:SQLite:dbname=file.sqlite> [login] [pass]";
+my $usage = "USAGE: $0 <object-name/substring> <dbi:SQLite:dbname=file.sqlite> [login [pass]]";
 
 my $name = shift; defined $name or die $usage;
 my $dbi = shift or die $usage;

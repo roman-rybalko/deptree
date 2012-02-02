@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 while [ -n "$1" ]; do
     for apk in "$1"/*.apk; do

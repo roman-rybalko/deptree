@@ -1,3 +1,6 @@
-#!/bin/sh
+#!/bin/sh -e
 
-./remove_object.pl $1 dbi:SQLite:dbname=test.sqlite
+obj="$1"
+[ -n "$obj" ]
+shift
+./remove_object.pl "$obj" dbi:SQLite:dbname=test.sqlite "" "" "$@"

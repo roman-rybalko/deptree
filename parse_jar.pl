@@ -8,7 +8,7 @@ use File::Temp qw(tempdir);
 use File::Basename qw(basename);
 use Digest::CRC qw(crc32);
 
-my $usage = "USAGE: $0 <package.jar> <dbi:SQLite:dbname=file.sqlite> [login] [pass]";
+my $usage = "USAGE: $0 <package.jar> <dbi:SQLite:dbname=file.sqlite> [login [pass]]";
 
 my $jar = shift or die $usage;
 my $dbi = shift or die $usage;
