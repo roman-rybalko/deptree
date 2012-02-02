@@ -52,24 +52,16 @@ ATTNavigator.apk dependency
 
 List symbols and objects, which provide/require them. Substring may be specified.
 $ ./list_symbols.sh libext2fs.so
-libext2fs.so
-required by:
-vold
-provided by:
-libext2fs.so
+symbol libext2fs.so
+required_by vold
+provided_by libext2fs.so
 $ ./list_symbols.sh iqclient
-com.carrieriq.iqagent.client.IQClient
-required by:
-android.policy.jar
-ext.jar
-framework.jar
-services.jar
-provided by:
-ext.jar
-com.android.internal.policy.impl.IQClientThreadRunnable
-required by:
-provided by:
-android.policy.jar
+symbol com.carrieriq.iqagent.client.IQClient
+required_by android.policy.jar ext.jar framework.jar services.jar
+provided_by ext.jar
+symbol com.android.internal.policy.impl.IQClientThreadRunnable
+required_by
+provided_by android.policy.jar
 
 List symbols/objects, which the object provides and on which depends.
 $ ./list_dependencies.sh ext2
