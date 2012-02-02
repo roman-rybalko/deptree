@@ -22,19 +22,21 @@ eval {
     {
         my $sym_name = $row->[0];
         my $sym_id = $row->[1];
+        my $data2;
+        my $row2;
         print "symbol $sym_name\n";
-        my $data_dep = $dbh->selectall_arrayref("select name,id from depends,objects where objects.id = depends.object_id and symbol_id = $sym_id");
+        $data2 = $dbh->selectall_arrayref("select name,id from depends,objects where objects.id = depends.object_id and symbol_id = $sym_id");
         print "required_by";
-        foreach my $row_dep (@{$data_dep})
+        foreach $row2 (@{$data2})
         {
-            print " $row_dep->[0]";
+            print " $row2->[0]";
         }
         print "\n";
-        my $data_prov = $dbh->selectall_arrayref("select name,id from provides,objects where objects.id = provides.object_id and symbol_id = $sym_id");
+        $data2 = $dbh->selectall_arrayref("select name,id from provides,objects where objects.id = provides.object_id and symbol_id = $sym_id");
         print "provided_by";
-        foreach my $row_prov (@{$data_prov})
+        foreach $row2 (@{$data2})
         {
-            print " $row_prov->[0]";
+            print " $row2->[0]";
         }
         print "\n";
     }
